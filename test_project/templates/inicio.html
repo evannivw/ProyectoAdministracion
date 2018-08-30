@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load staticfiles %}
+<head>
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="{% static 'inicio.css' %}" />
+    <script src="https://code.highcharts.com/highcharts.src.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+	<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/histogram-bellcurve.js"></script>
+    <link rel="stylesheet" href="{% static 'css/blog.css' %}">
+    <!-- code to include the highcharts and jQuery libraries goes here -->
+    <!-- load_charts filter takes a comma-separated list of id's where -->
+    <!-- the charts need to be rendered to                             -->
+</head>
+<body>
+
+<hr></hr>
+<div class="container"><h1>Proyecto Metodologia para el desarollo de proyectos</h1></div>
+<br />
+<br />
+<div id="exTab2" class="container">
+        <ul class="nav nav-tabs">
+            <li>
+			<!--<li class= "{{pestañaMonteCarlo}}">-->
+                <a  href="#1" data-toggle="tab">Simulacion Montecarlo</a>
+			</li>
+			<li ">
+                <a href="#2" data-toggle="tab">Curvas de Aprendizaje</a>
+			</li>
+		</ul>
+        <div class="tab-content ">
+            <div class="tab-pane {{pestañaMonteCarlo}}" id="1">
+                <br />
+                 <div><h1>Simulador de MonteCarlo</h1></div>
+                <br />
+                 <div class="table-wrapper-scroll-y">
+                   <table class="table table-bordered table-striped">
+                        <form method="POST" action = "" >
+                            {% csrf_token %}
+                           <!-- {{ form.as_table }}-->
+                            <label>Valor Minimo</label>
+                            <input class="form-control" id="vminhelp" type="text" name="Vmin" value="{{vmin}}" maxlength="50">
+                            <small id="vminhelp" class="form-text text-muted">Usage: 1010 100 300</small>
+
+                            <br />
+                            <br />
+                            <label>Valor Maximo</label>
+                            <input class="form-control" id="vmaxhelp" type="text" name="Vmax" value="{{vmax}}" maxlength="50">
+                            <small id="vmaxhelp" class="form-text text-muted">Usage: 1010 100 300</small>
+                            <br />
+
+                            <br />
+                            <button id="Agregar" type="submit" name="MonteCarlo" class="btn btn-primary mb-2" value="Realizar simulacion">Realizar simulacion</button>
+                        </form>
+                   </table>
+                 </div>
+                <br />
+                <div class="table-wrapper-scroll-y">
+                  <table class="table table-bordered table-striped">
+                    <tr >
+                      <th scope="col">Total</th>
+                    </tr>
+                    <!--<tbody>-->
+                    {% for item in puntosMonteCarlo %}
+                      <tr><td>{{ item }}</td></tr>
+                    {% endfor %}
+                   <!-- </tbody>-->
+                </table>
+
+                </div>
+                 <div id="container1"></div>
+                    <script>
+                     Highcharts.chart('container1', {
+                      title: {
+                        text: 'Simulacion Montecarlo'
+                      },
+                      xAxis: [{
+                        title: { text: 'Costo' },
+                        alignTicks: false
+                      }, {
+                        title: { text: 'x' },
+                        alignTicks: false,
+                        opposite: true
+                      }],
+
+                      yAxis: [{
+                        title: { text: 'Frecuencia' }
+                      }, {
+                        title: { text: 'y' },
+                        opposite: true
+                      }
+
+                            ],
+
+                      series: [{
+                        name: 'Simulacion Montecarlo',
+                        type: 'histogram',
+                        xAxis: 1,
+                        yAxis: 1,
+                        baseSeries: 's1',
+                        zIndex: -1
+                      }, {
+                        name: 'Data',
+                        type: 'scatter',
+                        data: {{puntosMonteCarlo}},
+                        id: 's1',
+                        marker: {
+                          radius: 1.5
+                        }
+                      }]
+                    });
+                </script>
+
+            </div>
+             <label>Costo Esperado: </label>
+
+                {{costo}}
+            <div class="tab-pane {{pestañaCurvas}}" id="2">
+                <br />
+                <br />
+
+                 <form method="POST" action = "" >
+                     {% csrf_token %}
+                     {{ form.as_table }}
+                    <!-- <label for="unidad">Unidad</label>
+                     <input type="text" class="form-control" id="unidad" name="unidad" placeholder="Numero de unidades requeridas">
+                     <br />-->
+                     <label for="aprendizaje">Aprendizaje</label>
+                     <input type="text" class="form-control" id="aprendizaje" name="aprendizaje" placeholder="Taza de aprendizaje (porcentaje)" value="{{aprendizaje}}">
+                     <br />
+                     <label for="primera_unidad">Tiempo primera unidad</label>
+                     <input type="text" class="form-control" id="primera_unidad" name="primera_unidad" placeholder="El tiempo necesario para realizar la primera unidad (horas)" value="{{primera_unidad}}">
+                     <br />
+                     <button id="Agregar" type="submit" name="Curvas" class="btn btn-primary mb-2" value="Graficar Curva">Graficar Curva</button>
+                 </form>
+                <br />
+                <br />
+                <div id="container"></div>
+                <script>
+                    Highcharts.chart('container', {
+                        chart: {
+                            type: 'line'
+                        },
+                        title: {
+                            text: 'Curvas de Aprendizaje'
+                        },
+                        xAxis: {
+                            categories: ['0', '1', '2', '3', '4']
+                        },
+
+                      plotOptions: {
+                        line: {
+                            dataLabels: {
+                                enabled: true
+                            },
+                            enableMouseTracking: false
+                        }
+                    },
+                        series: [
+                            {
+                            name: 'Horas por unidad',
+                            data: {{curvaAprendizaje}},
+                            },
+                            {
+                            name: 'Horas Acumuladas',
+                            data: {{curvaApredizajeAcumulada}},
+                            color: 'purple'
+                            }
+                        ]
+                    });
+                </script>
+            </div>
+
+        </div>
+  </div>
+
+<hr></hr>
+
+
+</body>
+</html>
